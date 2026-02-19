@@ -3,7 +3,7 @@ import streamlit as st
 from sqlalchemy import create_engine
 
 # Page setup
-st.set_page_config(page_title="Products", page_icon="🪑")
+st.set_page_config(page_title="Reptile Central", page_icon="🦎")
 st.title("Hello World!")
 
 # Database credentials
