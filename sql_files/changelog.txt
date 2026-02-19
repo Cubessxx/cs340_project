@@ -1,0 +1,10 @@
+Changelog (Step 3 Final)
+
+
+Other:
+-The website has been completly rebuilt from scratch. We are now using Streamlit with python which is a good choice for a application such as this 
+- We are now using our own provider for the MySQL server and web-hosting. This will be helpful to prevent server load for other students.
+DDL
+-In the intrest of the stability of our data, we have added "NOT NULL" to many foreign keys
+-We had previously used "On Delete Cascade" for every foreign key. This is not a good choice for data preservation. So it was removed where it was deemed harmful(From 8 to 3 Instances) and where it made sense we implemented ON DELETE SET NULL(From 0 to 2 Instances)
+-Animals now have a name attribute. This is common in real reptile stores and also makes the UI more friendly

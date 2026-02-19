@@ -3,14 +3,14 @@ import streamlit as st
 from db import get_engine
 
 # Page setup
-st.set_page_config(page_title="Reptile Central", page_icon="🦎")
-st.title("Animals")
-
 engine = get_engine()
+st.set_page_config(page_title="Reptile Central", page_icon="🦎")
 
-# Load Animals table
-query = "SELECT * FROM Animals;"
-df = pd.read_sql(query, engine)
 
-# Display table
-st.dataframe(df, use_container_width=True, hide_index=True)
+
+st.title("Welcome to the Reptile Central Database Manager!")
+st.write(
+    "Use this website to view and manage our animals, products, customers and orders. "
+)
+st.image("assets/leopard_gecko.jpg", width="content")
+
