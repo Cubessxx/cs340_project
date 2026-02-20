@@ -52,7 +52,7 @@ CREATE TABLE Orders (
     employeeID int,
     PRIMARY KEY (orderID),
     FOREIGN KEY (customerID) REFERENCES Customers(customerID) ON DELETE CASCADE,
-    FOREIGN KEY (employeeID) REFERENCES Employees(employeeID) ON DELETE CASCADE
+    FOREIGN KEY (employeeID) REFERENCES Employees(employeeID) ON DELETE SET NULL
 );
 
 -- ProductTypes Table
@@ -108,7 +108,7 @@ CREATE TABLE EmployeeAnimals (
     employeeID int NOT NULL,
     PRIMARY KEY (animalDetailsID),
     FOREIGN KEY (animalID) REFERENCES Animals(animalID) ON DELETE CASCADE,
-    FOREIGN KEY (employeeID) REFERENCES Employees(employeeID) ON DELETE CASCADE
+    FOREIGN KEY (employeeID) REFERENCES Employees(employeeID) ON DELETE SET NULL
 );
 
 /*
