@@ -96,6 +96,13 @@ with tab_create:
                     "isAvailableInput": available_value,
                 },
             )
+            # Add new entry in EmployeeAnimals for new animal
+            animal_id = conn.execute(text("SELECT LAST_INSERT_ID()")).scalar()
+            employee_id = conn.execute(text("SELECT employeeID FROM Employees WHERE jobTitle = 'Animal Care Specialist'")).scalar()
+            conn.execute(
+                text("INSERT INTO EmployeeAnimals (animalID, employeeID) VALUES (:animalID, :employeeID)"),
+                {"animalID": animal_id, "employeeID": employee_id}
+            )
         st.rerun()
 
 with tab_update:

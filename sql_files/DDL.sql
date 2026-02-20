@@ -105,7 +105,7 @@ CREATE TABLE OrderDetails (
 CREATE TABLE EmployeeAnimals (
     animalDetailsID int NOT NULL AUTO_INCREMENT,
     animalID int NOT NULL,
-    employeeID int NOT NULL,
+    employeeID int,
     PRIMARY KEY (animalDetailsID),
     FOREIGN KEY (animalID) REFERENCES Animals(animalID) ON DELETE CASCADE,
     FOREIGN KEY (employeeID) REFERENCES Employees(employeeID) ON DELETE SET NULL
