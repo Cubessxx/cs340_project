@@ -6,12 +6,23 @@ Members: Gage Cox
 */
 
 START TRANSACTION;
-SET FOREIGN_KEY_CHECKS=0;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS EmployeeAnimals;
+DROP TABLE IF EXISTS OrderDetails;
+DROP TABLE IF EXISTS Animals;
+DROP TABLE IF EXISTS Orders;
+DROP TABLE IF EXISTS Products;
+DROP TABLE IF EXISTS ProductTypes;
+DROP TABLE IF EXISTS Employees;
+DROP TABLE IF EXISTS Customers;
+
+SET FOREIGN_KEY_CHECKS = 1;
 SET AUTOCOMMIT=0;
 
 -- Customers Table
 -- Records information about customers who purchase products or animals from the store.
-DROP TABLE IF EXISTS Customers;
 CREATE TABLE Customers (
     customerID int NOT NULL AUTO_INCREMENT,
     firstName varchar(50) NOT NULL,
@@ -23,7 +34,6 @@ CREATE TABLE Customers (
 
 -- Employees Table
 -- Represents a single employee, the transactions they make, and the animals they take care of
-DROP TABLE IF EXISTS Employees;
 CREATE TABLE Employees (
     employeeID int NOT NULL AUTO_INCREMENT,
     firstName varchar(50) NOT NULL,
@@ -34,7 +44,6 @@ CREATE TABLE Employees (
 
 -- Orders Table
 -- Represents a transaction made by a customer. An order may include both products and animals of any quantity. 
-DROP TABLE IF EXISTS Orders;
 CREATE TABLE Orders (
     orderID int NOT NULL AUTO_INCREMENT,
     orderDate date NOT NULL,
@@ -48,7 +57,6 @@ CREATE TABLE Orders (
 
 -- ProductTypes Table
 -- Definition table for product types to prevent redundancy.
-DROP TABLE IF EXISTS ProductTypes;
 CREATE TABLE ProductTypes (
     productTypeCode varchar(50) NOT NULL,
     productTypeName varchar(50) NOT NULL,
@@ -57,7 +65,6 @@ CREATE TABLE ProductTypes (
 
 -- Products Table
 -- Represents non-living products sold in store.
-DROP TABLE IF EXISTS Products;
 CREATE TABLE Products (
     productID int NOT NULL AUTO_INCREMENT,
     productName varchar(50) NOT NULL,
@@ -70,7 +77,6 @@ CREATE TABLE Products (
 
 -- Animals Table
 -- Represents a singular individual animal
-DROP TABLE IF EXISTS Animals;
 CREATE TABLE Animals (
     animalID int NOT NULL AUTO_INCREMENT,
     name varchar(50),
@@ -84,7 +90,6 @@ CREATE TABLE Animals (
 );
 
 -- Intersection of Orders and Products
-DROP TABLE IF EXISTS OrderDetails;
 CREATE TABLE OrderDetails (
     orderDetailsID int NOT NULL AUTO_INCREMENT,
     orderID int NOT NULL,
@@ -97,7 +102,6 @@ CREATE TABLE OrderDetails (
 );
 
 -- Intersection of Animals and Employees
-DROP TABLE IF EXISTS EmployeeAnimals;
 CREATE TABLE EmployeeAnimals (
     animalDetailsID int NOT NULL AUTO_INCREMENT,
     animalID int NOT NULL,
