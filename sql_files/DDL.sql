@@ -79,7 +79,7 @@ CREATE TABLE Products (
 -- Represents a singular individual animal
 CREATE TABLE Animals (
     animalID int NOT NULL AUTO_INCREMENT,
-    name varchar(50),
+    name varchar(50) NOT NULL,
     species varchar(100) NOT NULL,
     age int NOT NULL,
     price decimal(10,2) NOT NULL,
