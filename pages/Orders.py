@@ -1,12 +1,14 @@
-﻿import pandas as pd
+import pandas as pd
 import streamlit as st
 from sqlalchemy import text
 from db import get_engine
+from reset_button import render_reset_button
 
-st.set_page_config(page_title="Reptile Central - Orders", layout="wide")
+st.set_page_config(page_title="Reptile Central - Orders",page_icon="??", layout="wide")
 st.title("Orders")
 
 engine = get_engine()
+render_reset_button(engine, key='reset_db_button')
 
 
 # Views
@@ -112,7 +114,7 @@ with tab_browse:
     if orders_df.empty:
         st.write("No orders found.")
     else:
-        st.dataframe(orders_browse_df, use_container_width=True, hide_index=True)
+        st.dataframe(orders_browse_df, width='stretch', hide_index=True)
 
 
 # View and Update Order Details
@@ -138,7 +140,7 @@ with tab_update:
         )
 
         if not details_df.empty:
-            st.dataframe(details_df, use_container_width=True, hide_index=True)
+            st.dataframe(details_df, width='stretch', hide_index=True)
         else:
             st.write("No line items for this order.")
 
@@ -208,7 +210,7 @@ with tab_manage:
             st.caption("Click on the quantities tab to adjust the quantity for any product")
             edited_df = st.data_editor(
                 entry_df,
-                use_container_width=True,
+                width='stretch',
                 hide_index=True,
                 disabled=["Product ID", "Product Name", "Unit Price"],
                 column_config={
@@ -232,7 +234,7 @@ with tab_manage:
             items = items[items["Quantity"] > 0]
 
             if items.empty:
-                st.warning("No quantities entered. Nothing to create.")
+                st.write("No quantities entered. Nothing to create.")
             else:
                 with engine.begin() as conn:
                     result = conn.execute(
@@ -277,7 +279,6 @@ with tab_manage:
         )
         selected_order_id = int(orders_df.loc[selected_order_idx, "Order ID"])
 
-        st.warning("This deletes the entire order and all its line items.")
         if st.button("Delete Order"):
             with engine.begin() as conn:
                 conn.execute(

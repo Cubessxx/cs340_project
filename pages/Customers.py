@@ -1,12 +1,14 @@
-﻿import pandas as pd
+import pandas as pd
 import streamlit as st
 from sqlalchemy import text
 from db import get_engine
+from reset_button import render_reset_button
 
-st.set_page_config(page_title="Reptile Central - Customers", layout="wide")
+st.set_page_config(page_title="Reptile Central - Customers",page_icon ="???????" , layout="wide")
 st.title("Customers")
 
 engine = get_engine()
+render_reset_button(engine, key='reset_db_button')
 
 # Views
 customers_query = """
@@ -51,7 +53,7 @@ tab_browse, tab_create, tab_update, tab_delete = st.tabs(
 # Browse Customers
 with tab_browse:
     st.subheader("Browse Customers")
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width='stretch', hide_index=True)
 
 
 # Create Customer

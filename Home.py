@@ -1,9 +1,11 @@
 import pandas as pd
 import streamlit as st
 from db import get_engine
+from reset_button import render_reset_button
 
 # Page setup
 engine = get_engine()
+render_reset_button(engine, key='reset_db_button')
 st.set_page_config(page_title="Reptile Central", page_icon="🦎")
 
 
