@@ -74,21 +74,15 @@ if not employees_df.empty:
     ).str.strip()
 
 orders_df["Customer Name"] = (
-    orders_df["Customer First Name"].fillna("").astype(str).str.strip() + " " +
-    orders_df["Customer Last Name"].fillna("").astype(str).str.strip()
+    orders_df["First Name"].fillna("").astype(str).str.strip() + " " +
+    orders_df["Last Name"].fillna("").astype(str).str.strip()
 ).str.strip()
 orders_df["Assigned Employee"] = (
     orders_df["Employee First Name"].fillna("").astype(str).str.strip() + " " +
     orders_df["Employee Last Name"].fillna("").astype(str).str.strip()
 ).str.strip()
 
-orders_browse_df = orders_df.rename(
-    columns={
-        "Customer First Name": "First Name",
-        "Customer Last Name": "Last Name",
-    }
-)
-orders_browse_df = orders_browse_df[
+orders_browse_df = orders_df[
     ["Order ID", "Order Date", "First Name", "Last Name", "Assigned Employee", "Order Total"]
 ]
 

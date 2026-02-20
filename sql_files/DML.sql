@@ -10,15 +10,55 @@ Members: Gage Cox
 
 
 
---2. Customers Page
--- Displays Customers along with their first name, last name, email and phone number.
--- Additional Column  "activeOrders" that displays how many enteries from the "Orders" table a given customer is associated with.
-SELECT Customers.customerID,
-       Customers.firstName,
-       Customers.lastName,
-       Customers.email,
-       Customers.phoneNumber,
-       COUNT(Orders.orderID) AS activeOrders
+-- 2. Animals Page
+-- "Browse Animals" tab displays "Name", "Species", "Age", "Price", "Available", and "Order ID".
+SELECT Animals.animalID AS "Animal ID",
+       Animals.name AS "Name",
+       Animals.species AS "Species",
+       Animals.age AS "Age",
+       Animals.price AS "Price",
+       CASE WHEN Animals.isAvailable = 1 THEN 'Yes' ELSE 'No' END AS "Available",
+       Animals.orderID AS "Order ID"
+FROM Animals
+ORDER BY Animals.animalID;
+
+-- "Create Animal" tab: Inputs: "Name", "Species", "Age", "Price", "Available" Button: "Create Animal" (orderID defaults to NULL).
+INSERT INTO Animals (name, species, age, price, isAvailable, orderID)
+VALUES (:nameInput, :speciesInput, :ageInput, :priceInput, :isAvailableInput, NULL);
+
+-- "Update Animal" tab:  Selectbox: "Select Animal", Inputs: "Age", "Price", "Available", Button: "Update Animal".
+UPDATE Animals
+SET Animals.age = :ageInput,
+    Animals.price = :priceInput,
+    Animals.isAvailable = :isAvailableInput
+WHERE Animals.animalID = :animalID_from_update_animal_form;
+
+-- "Delete Animal" tab: Selectbox: "Select Animal" Button: "Delete Animal".
+DELETE FROM Animals
+WHERE Animals.animalID = :animalID_selected_from_browse_animals_page;
+
+-- "Employee Assignments" tab displays "Assignment ID", "Animal Name", "Employee Name" and "Job Title".
+SELECT EmployeeAnimals.animalDetailsID AS "Assignment ID",
+       Animals.name AS "Animal Name",
+       CONCAT(Employees.firstName, ' ', Employees.lastName) AS "Employee Name",
+       Employees.jobTitle AS "Job Title"
+FROM EmployeeAnimals
+JOIN Animals
+  ON EmployeeAnimals.animalID = Animals.animalID
+JOIN Employees
+  ON EmployeeAnimals.employeeID = Employees.employeeID
+ORDER BY EmployeeAnimals.animalDetailsID;
+
+
+
+-- 3. Customers Page
+-- "Browse Customers" tab displays "Customer ID", "First Name", "Last Name", "Email", "Phone Number", and "Active Orders".
+SELECT Customers.customerID AS "Customer ID",
+       Customers.firstName AS "First Name",
+       Customers.lastName AS "Last Name",
+       Customers.email AS "Email",
+       Customers.phoneNumber AS "Phone Number",
+       COUNT(Orders.orderID) AS "Active Orders"
 FROM Customers
 LEFT JOIN Orders
        ON Orders.customerID = Customers.customerID
@@ -29,200 +69,236 @@ GROUP BY Customers.customerID,
          Customers.phoneNumber
 ORDER BY Customers.customerID;
 
---Delete button next to each individual customer
-DELETE FROM Customers
-WHERE Customers.customerID = :customerID_selected_from_browse_customers_page;
-
---'Create a Customer' form with entry information for Customers First Name, Last Name, Email, Phone Number.
+-- "Create Customer" tab: Inputs: "First Name", "Last Name", "Email", "Phone Number" Button: "Create Customer".
 INSERT INTO Customers (firstName, lastName, email, phoneNumber)
 VALUES (:firstNameInput, :lastNameInput, :emailInput, :phoneNumberInput);
 
---'Update a Customer' form where a customer is selected and new information may be entered for there Email and Phone Number. 
-SELECT Customers.customerID,
-       Customers.firstName,
-       Customers.lastName,
-       Customers.email,
-       Customers.phoneNumber
+-- "Update Customer" tab: Selectbox: "Select Customer" loads current values for "Email" and "Phone Number".
+SELECT Customers.customerID AS "Customer ID",
+       Customers.firstName AS "First Name",
+       Customers.lastName AS "Last Name",
+       Customers.email AS "Email",
+       Customers.phoneNumber AS "Phone Number"
 FROM Customers
 WHERE Customers.customerID = :customerID_selected_from_browse_customers_page;
 
+-- "Update Customer" tab: Inputs: "New Email", "New Phone Number" Button: "Update Customer".
 UPDATE Customers
 SET Customers.email = :emailInput,
     Customers.phoneNumber = :phoneNumberInput
 WHERE Customers.customerID = :customerID_from_update_customer_form;
 
+-- "Delete Customer" tab: Selectbox: "Select Customer" Button: "Delete Customer".
+DELETE FROM Customers
+WHERE Customers.customerID = :customerID_selected_from_browse_customers_page;
 
 
---3. Orders Page
---Displays Orders along with their date, associated customer, associated employee and total amount.
-SELECT Orders.orderID,
-       Orders.orderDate,
-       Orders.customerID,
-       Orders.employeeID,
-       Orders.orderTotal,
+
+-- 4. Employees Page
+-- "Browse Employees" tab displays "Employee ID", "First Name", "Last Name", and "Job Title".
+SELECT Employees.employeeID AS "Employee ID",
+       Employees.firstName AS "First Name",
+       Employees.lastName AS "Last Name",
+       Employees.jobTitle AS "Job Title"
+FROM Employees
+ORDER BY Employees.employeeID;
+
+-- "Create Employee" tab: Inputs: "First Name", "Last Name", "Job Title" Button: "Create Employee".
+INSERT INTO Employees (firstName, lastName, jobTitle)
+VALUES (:firstNameInput, :lastNameInput, :jobTitleInput);
+
+-- "Delete Employee" tab: Selectbox: "Select Employee" Button: "Delete Employee".
+DELETE FROM Employees
+WHERE Employees.employeeID = :employeeID_selected_from_browse_employees_page;
+
+
+
+-- 5. Orders Page
+-- "Browse Orders" tab displays "Order ID", "Order Date", "Order Total", "Customer ID", "First Name", "Last Name", "Employee ID", "Employee First Name", and "Employee Last Name".
+SELECT Orders.orderID AS "Order ID",
+       Orders.orderDate AS "Order Date",
+       Orders.orderTotal AS "Order Total",
+       Customers.customerID AS "Customer ID",
+       Customers.firstName AS "First Name",
+       Customers.lastName AS "Last Name",
+       Employees.employeeID AS "Employee ID",
+       Employees.firstName AS "Employee First Name",
+       Employees.lastName AS "Employee Last Name"
 FROM Orders
+LEFT JOIN Customers
+       ON Orders.customerID = Customers.customerID
+LEFT JOIN Employees
+       ON Orders.employeeID = Employees.employeeID
 ORDER BY Orders.orderID;
 
---Delete button next to each Order
+-- "View or Update Order Details" tab displays "Order Details ID", "Order ID", "Product ID", "Product Name", "Quantity", "Unit Price", and "Line Total" for selected "Order".
+SELECT OrderDetails.orderDetailsID AS "Order Details ID",
+       OrderDetails.orderID AS "Order ID",
+       Products.productID AS "Product ID",
+       Products.productName AS "Product Name",
+       OrderDetails.quantity AS "Quantity",
+       OrderDetails.unitPrice AS "Unit Price",
+       (OrderDetails.quantity * OrderDetails.unitPrice) AS "Line Total"
+FROM OrderDetails
+LEFT JOIN Products
+       ON OrderDetails.productID = Products.productID
+WHERE OrderDetails.orderID = :orderID_selected_from_browse_orders_page
+ORDER BY OrderDetails.orderID,
+         OrderDetails.orderDetailsID;
+
+-- "View or Update Order Details" tab: Selectbox: "Select Item" data source displays "Product ID", "Product Name", "Unit Price", and "Stock".
+SELECT Products.productID AS "Product ID",
+       Products.productName AS "Product Name",
+       Products.price AS "Unit Price",
+       Products.stock AS "Stock"
+FROM Products
+ORDER BY Products.productName;
+
+-- "View or Update Order Details" tab: Button: "Update or Add Item" looks up selected "Select Item" price.
+SELECT Products.price AS unitPriceCalculated
+FROM Products
+WHERE Products.productID = :productIDInput;
+
+-- "View or Update Order Details" tab: Button: "Update or Add Item" checks if selected "Order" already has selected "Select Item".
+SELECT OrderDetails.orderDetailsID
+FROM OrderDetails
+WHERE OrderDetails.orderID = :orderID_from_create_order_form
+  AND OrderDetails.productID = :productIDInput
+LIMIT 1;
+
+-- "View or Update Order Details" tab: Button: "Update or Add Item" inserts new line item when order/product pair does not exist.
+INSERT INTO OrderDetails (orderID, productID, quantity, unitPrice)
+VALUES (:orderID_from_create_order_form, :productIDInput, :quantityInput, :unitPriceCalculated);
+
+-- "View or Update Order Details" tab: Button: "Update or Add Item" updates line item when order/product pair exists.
+UPDATE OrderDetails
+SET OrderDetails.quantity = :quantityInput,
+    OrderDetails.unitPrice = :unitPriceCalculated
+WHERE OrderDetails.orderDetailsID = :existingOrderDetailsID;
+
+-- "View or Update Order Details" tab: Button: "Update or Add Item" recalculates selected "Order Total".
+UPDATE Orders
+SET Orders.orderTotal = (
+    SELECT COALESCE(SUM(OrderDetails.quantity * OrderDetails.unitPrice), 0.00)
+    FROM OrderDetails
+    WHERE OrderDetails.orderID = :orderID_from_create_order_form
+)
+WHERE Orders.orderID = :orderID_from_create_order_form;
+
+-- "Create or Delete Order" tab: Selectbox: "Customer" data source displays "Customer ID", "First Name", and "Last Name".
+SELECT Customers.customerID AS "Customer ID",
+       Customers.firstName AS "First Name",
+       Customers.lastName AS "Last Name"
+FROM Customers
+ORDER BY Customers.lastName,
+         Customers.firstName;
+
+-- "Create or Delete Order" tab: Selectbox: "Assigned Employee" data source displays "Employee ID", "First Name", "Last Name", and "Job Title".
+SELECT Employees.employeeID AS "Employee ID",
+       Employees.firstName AS "First Name",
+       Employees.lastName AS "Last Name",
+       Employees.jobTitle AS "Job Title"
+FROM Employees
+ORDER BY Employees.lastName,
+         Employees.firstName;
+
+-- "Create or Delete Order" tab: "Create Order" section: Inputs: "Customer", "Assigned Employee" Button: "Create Order".
+INSERT INTO Orders (orderDate, orderTotal, customerID, employeeID)
+VALUES (CURDATE(), 0.00, :customerID_selected_from_create_order_form, :employeeID_selected_from_create_order_form);
+
+SELECT LAST_INSERT_ID() AS orderID;
+
+-- "Create or Delete Order" tab: "Delete Order" section: Selectbox: "Order" Button: "Delete Order".
 DELETE FROM Orders
 WHERE Orders.orderID = :orderID_selected_from_browse_orders_page;
 
 
 
-
---4. Order Details page
--- Simply displays the 'OrderDetails' table fully.
-SELECT *
-FROM OrderDetails
-ORDER BY OrderDetails.orderID;
-
-
-
-
---5. New Order Page
---Displays the current catalog of products along with input for quantity for each item that can be selectd 0-10. An associated customer and employee is chosen, and the 'Create Order' button generates the correlating order. 
-SELECT Products.productID,
-       Products.productName,
-       Products.productTypeCode,
-       Products.price,
-       Products.stock
+-- 6. Products Page
+-- "Browse Products" tab displays "Product ID", "Product Name", "Product Type Code", "Product Type Name", "Price", "Stock", and "Units Sold".
+SELECT Products.productID AS "Product ID",
+       Products.productName AS "Product Name",
+       ProductTypes.productTypeCode AS "Product Type Code",
+       ProductTypes.productTypeName AS "Product Type Name",
+       Products.price AS "Price",
+       Products.stock AS "Stock",
+       COALESCE(SUM(OrderDetails.quantity), 0) AS "Units Sold"
 FROM Products
+LEFT JOIN ProductTypes
+       ON Products.productTypeCode = ProductTypes.productTypeCode
+LEFT JOIN OrderDetails
+       ON OrderDetails.productID = Products.productID
+GROUP BY Products.productID,
+         Products.productName,
+         ProductTypes.productTypeCode,
+         ProductTypes.productTypeName,
+         Products.price,
+         Products.stock
 ORDER BY Products.productID;
 
-INSERT INTO Orders (orderDate, customerID, employeeID, orderTotal)
-VALUES (CURDATE(), :customerID_from_dropdown_Input, :employeeID_from_dropdown_Input, 0.00);
-
-SELECT LAST_INSERT_ID() AS newOrderID;
-
-INSERT INTO OrderDetails (orderID, productID, quantity)
-VALUES (:newOrderID_from_previous_step, :productID_selected_from_products_table, :quantityInput_1_to_10);
-
-UPDATE Products
-SET Products.stock = Products.stock - :quantityInput_1_to_10
-WHERE Products.productID = :productID_selected_from_products_table;
-
-UPDATE Orders
-SET Orders.orderTotal =
-(
-    SELECT IFNULL(SUM(OrderDetails.quantity * Products.price), 0.00)
-    FROM OrderDetails
-    INNER JOIN Products
-            ON Products.productID = OrderDetails.productID
-    WHERE OrderDetails.orderID = Orders.orderID
-)
-WHERE Orders.orderID = :newOrderID_from_previous_step;
-
--- Citation for use of AI Tools:
---    # Date: 02/12/26
---      # Prompts used to assist with coding SQL for 'New Order Page'
---     # "Based on the following specification of the desired SQL page, how could I write DML sql code similar to previous pages? walk through the solution step by step"
---     # AI Source URL: https://chatgpt.com/
-    
-
-Links to an external site. 
-
-
---6. Products Page
---Displays products alongside their name, type code, price and current stock.
-SELECT Products.productID,
-       Products.productName,
-       Products.productTypeCode,
-       Products.price,
-       Products.stock
-FROM Products
-ORDER BY Products.productID;
-
---'Create a Product' Form where a new product is created with a name, type, price and current amount of stock.
-SELECT ProductTypes.productTypeCode,
-       ProductTypes.productTypeName
+-- "Create Product" and "Update Product" tabs: Selectbox: "Product Type" data source displays "Product Type Code" and "Product Type Name".
+SELECT ProductTypes.productTypeCode AS "Product Type Code",
+       ProductTypes.productTypeName AS "Product Type Name"
 FROM ProductTypes
 ORDER BY ProductTypes.productTypeCode;
 
+-- "Create Product" tab: Inputs: "Product Name", "Product Type", "Price", "Stock" Button: "Create Product".
 INSERT INTO Products (productName, productTypeCode, price, stock)
-VALUES (:productNameInput, :productTypeCode_from_dropdown_Input, :priceInput, :stockInput);
+VALUES (:productNameInput,
+        :productTypeCode_selected_from_create_product_form,
+        :priceInput,
+        :stockInput);
 
---'Update Product Stock Form' where a preexisting product can be chosen and the associated stock is changed.
-SELECT Products.productID,
-       Products.productName
+-- "Update Product" tab: Selectbox: "Select Product" loads current values for "Product Name", "Product Type", "Price", and "Stock".
+SELECT Products.productID AS "Product ID",
+       Products.productName AS "Product Name",
+       Products.productTypeCode AS "Product Type Code",
+       Products.price AS "Price",
+       Products.stock AS "Stock"
 FROM Products
-ORDER BY Products.productID;
+WHERE Products.productID = :productID_selected_from_browse_products_page;
 
+-- "Update Product" tab: Inputs: "Product Name", "Product Type", "Price", "Stock" Button: "Update Product".
 UPDATE Products
-SET Products.stock = :newStockInput
-WHERE Products.productID = :productID_from_dropdown_Input;
+SET Products.productName = :productNameInput,
+    Products.productTypeCode = :productTypeCode_selected_from_update_product_form,
+    Products.price = :priceInput,
+    Products.stock = :stockInput
+WHERE Products.productID = :productID_from_update_product_form;
+
+-- "Delete Product" tab: Selectbox: "Select Product" Button: "Delete Product".
+DELETE FROM Products
+WHERE Products.productID = :productID_selected_from_browse_products_page;
 
 
 
-
---7. ProductTypes Page
--- Simply displays the "PrdouctTypes" table.
-SELECT *
+-- 7. Product Types Page
+-- "Browse Product Types" tab displays "Product Type Code", "Product Type Name", and "Products Using Type".
+SELECT ProductTypes.productTypeCode AS "Product Type Code",
+       ProductTypes.productTypeName AS "Product Type Name",
+       COUNT(Products.productID) AS "Products Using Type"
 FROM ProductTypes
+LEFT JOIN Products
+       ON Products.productTypeCode = ProductTypes.productTypeCode
+GROUP BY ProductTypes.productTypeCode,
+         ProductTypes.productTypeName
 ORDER BY ProductTypes.productTypeCode;
 
+-- "Create Product Type" tab: Inputs: "Product Type Code", "Product Type Name" Button: "Create Product Type".
+INSERT INTO ProductTypes (productTypeCode, productTypeName)
+VALUES (:productTypeCodeInput, :productTypeNameInput);
 
+-- "Update Product Type" tab: Selectbox: "Select Product Type" loads current value for "Product Type Name".
+SELECT ProductTypes.productTypeCode AS "Product Type Code",
+       ProductTypes.productTypeName AS "Product Type Name"
+FROM ProductTypes
+WHERE ProductTypes.productTypeCode = :productTypeCode_selected_from_browse_product_types_page;
 
+-- "Update Product Type" tab: Inputs: "Product Type Name" Button: "Update Product Type".
+UPDATE ProductTypes
+SET ProductTypes.productTypeName = :productTypeNameInput
+WHERE ProductTypes.productTypeCode = :productTypeCode_from_update_product_type_form;
 
---8. Employees Page
--- Displays Employees along with their respective employeeID and jobTitle.
-SELECT Employees.employeeID,
-       Employees.firstName,
-       Employees.lastName,
-       Employees.jobTitle
-FROM Employees
-ORDER BY Employees.employeeID;
-
---Delete button next to each individual employee 
-DELETE FROM Employees
-WHERE Employees.employeeID = :employeeID_selected_from_browse_employees_page;
-
---'New Employee' Form where a new employee is created with a first name, last name and job title.
-INSERT INTO Employees (firstName, lastName, jobTitle)
-VALUES (:firstNameInput, :lastNameInput, :jobTitleInput);
-
-
-
-
---9. EmployeesAnimal Page
---Simply displays the EmployeesAnimal table.
-SELECT *
-FROM EmployeesAnimal
-ORDER BY EmployeesAnimal.employeeID, EmployeesAnimal.animalID;
-
-
-
-
---10. Animals Page
--- Displays the individual animals alongside their current age, price, and avalability status. It also displays their respective order if their associated with one.
-SELECT Animals.animalID,
-       Animals.species,
-       Animals.age,
-       Animals.price,
-       Animals.isAvailable,
-       Animals.orderID
-FROM Animals
-ORDER BY Animals.animalID;
-
---Delete button next to each individual animal
-DELETE FROM Animals
-WHERE Animals.animalID = :animalID_selected_from_browse_animals_page;
-
---'Create a Animal' form where a new animal is added to the system with a given Species, Age and Price.
-INSERT INTO Animals (species, age, price, isAvailable, orderID)
-VALUES (:speciesInput, :ageInput, :priceInput, 1, NULL);
-
--- 'Update Animal' form where a animal can have its price, avalability status and the order it belongs to changed.
-SELECT Animals.animalID,
-       Animals.species,
-       Animals.age,
-       Animals.price,
-       Animals.isAvailable,
-       Animals.orderID
-FROM Animals
-WHERE Animals.animalID = :animalID_selected_from_browse_animals_page;
-
-UPDATE Animals
-SET Animals.price = :priceInput,
-    Animals.isAvailable = :isAvailableInput,
-    Animals.orderID = :orderIDInput
-WHERE Animals.animalID = :animalID_from_update_animal_form;
+-- "Delete Product Type" tab: Selectbox: "Select Product Type" Button: "Delete Product Type".
+DELETE FROM ProductTypes
+WHERE ProductTypes.productTypeCode = :productTypeCode_selected_from_browse_product_types_page;

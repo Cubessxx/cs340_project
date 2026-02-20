@@ -296,8 +296,8 @@ SELECT Orders.orderID AS "Order ID",
        Orders.orderDate AS "Order Date",
        Orders.orderTotal AS "Order Total",
        Customers.customerID AS "Customer ID",
-       Customers.firstName AS "Customer First Name",
-       Customers.lastName AS "Customer Last Name",
+       Customers.firstName AS "First Name",
+       Customers.lastName AS "Last Name",
        Employees.employeeID AS "Employee ID",
        Employees.firstName AS "Employee First Name",
        Employees.lastName AS "Employee Last Name"
@@ -577,4 +577,3 @@ BEGIN
 END //
 
 DELIMITER ;
-

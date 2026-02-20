@@ -2,11 +2,13 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import text
 from db import get_engine
+from reset_button import render_reset_button
 
 st.set_page_config(page_title="Reptile Central - Animals", page_icon="👤", layout="wide")
 st.title("Animals")
 
 engine = get_engine()
+render_reset_button(engine, key='reset_db_button')
 
 animals_query = """
 SELECT Animals.animalID AS "Animal ID",
