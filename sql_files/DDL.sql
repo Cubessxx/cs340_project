@@ -42,8 +42,8 @@ CREATE TABLE Orders (
     customerID int,
     employeeID int,
     PRIMARY KEY (orderID),
-    FOREIGN KEY (customerID) REFERENCES Customers(customerID) ON DELETE SET NULL,
-    FOREIGN KEY (employeeID) REFERENCES Employees(employeeID)
+    FOREIGN KEY (customerID) REFERENCES Customers(customerID) ON DELETE CASCADE,
+    FOREIGN KEY (employeeID) REFERENCES Employees(employeeID) ON DELETE CASCADE
 );
 
 -- ProductTypes Table
@@ -80,7 +80,7 @@ CREATE TABLE Animals (
     isAvailable tinyint(1) NOT NULL,
     orderID int,
     PRIMARY KEY (animalID),
-    FOREIGN KEY (orderID) REFERENCES Orders(orderID) ON DELETE SET NULL
+    FOREIGN KEY (orderID) REFERENCES Orders(orderID) ON DELETE CASCADE
 );
 
 -- Intersection of Orders and Products
@@ -93,7 +93,7 @@ CREATE TABLE OrderDetails (
     unitPrice decimal(10,2) NOT NULL,
     PRIMARY KEY (orderDetailsID),
     FOREIGN KEY (orderID) REFERENCES Orders(orderID) ON DELETE CASCADE,
-    FOREIGN KEY (productID) REFERENCES Products(productID)
+    FOREIGN KEY (productID) REFERENCES Products(productID) ON DELETE CASCADE
 );
 
 -- Intersection of Animals and Employees
@@ -160,9 +160,9 @@ VALUES (1, 1, 1, 199.99),
 
 -- EmployeeAnimals
 INSERT INTO EmployeeAnimals (animalID, employeeID)
-VALUES (1, 2),
-(2, 2),
-(3, 2);
+VALUES (1, (SELECT employeeID FROM Employees WHERE jobTitle = 'Animal Care Specialist')),
+(2, (SELECT employeeID FROM Employees WHERE jobTitle = 'Animal Care Specialist')),
+(3, (SELECT employeeID FROM Employees WHERE jobTitle = 'Animal Care Specialist'));
 
 SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
